@@ -21,9 +21,9 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-template <class _InputIterator, class _Predicate, class IterTag>
+template <class _InputIterator, class _Predicate, class _IterTag>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _InputIterator
-__find_if_impl(_InputIterator __first, _InputIterator __last, _Predicate __pred, IterTag) {
+__find_if_impl(_InputIterator __first, _InputIterator __last, _Predicate __pred, _IterTag) {
   for (; __first != __last; ++__first)
     if (__pred(*__first))
       break;
@@ -33,12 +33,9 @@ __find_if_impl(_InputIterator __first, _InputIterator __last, _Predicate __pred,
 template <class _RandomAccessIterator, class _Predicate>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _RandomAccessIterator __find_if_impl(
     _RandomAccessIterator __first, _RandomAccessIterator __last, _Predicate __pred, random_access_iterator_tag) {
-  using diff_t     = __iter_diff_t<_RandomAccessIterator>;
+  using diff_t = __iter_diff_t<_RandomAccessIterator>;
 
-  diff_t __dist       = distance(__first, __last);
-  diff_t __n_unrolled = __dist >> 2;
-
-  for (diff_t __i = 0; __i < __n_unrolled; ++__i) {
+  for (diff_t __n = (__last - __first) >> 2; __n > 0; --__n) {
     if (__pred(*__first))
       return __first;
     ++__first;
@@ -56,14 +53,10 @@ template <class _RandomAccessIterator, class _Predicate>
     ++__first;
   }
 
-  while (__first != __last) {
+  for (; __first != __last; ++__first)
     if (__pred(*__first))
-      return __first;
-    ++__first;
-  }
-
+      break;
   return __first;
-
 }
 
 template <class _InputIterator, class _Predicate>
