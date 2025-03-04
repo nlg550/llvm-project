@@ -16,7 +16,7 @@
 #include <vector>
 
 template <class Container>
-static void bm_find(benchmark::State& state) {
+static void bm_find_if(benchmark::State& state) {
   using T = Container::value_type;
 
   Container vec1(state.range(), '1');
@@ -30,11 +30,11 @@ static void bm_find(benchmark::State& state) {
     vec1[idx] = '1';
   }
 }
-BENCHMARK(bm_find<std::vector<char>>)->DenseRange(1, 8)->Range(16, 1 << 20);
-BENCHMARK(bm_find<std::vector<short>>)->DenseRange(1, 8)->Range(16, 1 << 20);
-BENCHMARK(bm_find<std::vector<int>>)->DenseRange(1, 8)->Range(16, 1 << 20);
-BENCHMARK(bm_find<std::deque<char>>)->DenseRange(1, 8)->Range(16, 1 << 20);
-BENCHMARK(bm_find<std::deque<short>>)->DenseRange(1, 8)->Range(16, 1 << 20);
-BENCHMARK(bm_find<std::deque<int>>)->DenseRange(1, 8)->Range(16, 1 << 20);
+BENCHMARK(bm_find_if<std::vector<char>>)->DenseRange(1, 8)->Range(16, 1 << 20);
+BENCHMARK(bm_find_if<std::vector<short>>)->DenseRange(1, 8)->Range(16, 1 << 20);
+BENCHMARK(bm_find_if<std::vector<int>>)->DenseRange(1, 8)->Range(16, 1 << 20);
+BENCHMARK(bm_find_if<std::deque<char>>)->DenseRange(1, 8)->Range(16, 1 << 20);
+BENCHMARK(bm_find_if<std::deque<short>>)->DenseRange(1, 8)->Range(16, 1 << 20);
+BENCHMARK(bm_find_if<std::deque<int>>)->DenseRange(1, 8)->Range(16, 1 << 20);
 
 BENCHMARK_MAIN();

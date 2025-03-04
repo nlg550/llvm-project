@@ -21,7 +21,6 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-// General case
 template <class _InputIterator, class _Predicate, class IterTag>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _InputIterator
 __find_if_impl(_InputIterator __first, _InputIterator __last, _Predicate __pred, IterTag) {
@@ -34,42 +33,37 @@ __find_if_impl(_InputIterator __first, _InputIterator __last, _Predicate __pred,
 template <class _RandomAccessIterator, class _Predicate>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _RandomAccessIterator __find_if_impl(
     _RandomAccessIterator __first, _RandomAccessIterator __last, _Predicate __pred, random_access_iterator_tag) {
-  using diff_t = __iter_diff_t<_RandomAccessIterator>;
+  using diff_t     = __iter_diff_t<_RandomAccessIterator>;
 
-  diff_t __dist = distance(__first, __last);
+  diff_t __dist       = distance(__first, __last);
+  diff_t __n_unrolled = __dist >> 2;
 
-  diff_t __last_unrolled = __dist - (__dist % 4);
-  _RandomAccessIterator __iters[4];
-  bool __found[4];
+  for (diff_t __i = 0; __i < __n_unrolled; ++__i) {
+    if (__pred(*__first))
+      return __first;
+    ++__first;
 
-  for (diff_t __i = 0; __i < __last_unrolled; __i += 4) {
-    __iters[0] = __first++;
-    __iters[1] = __first++;
-    __iters[2] = __first++;
-    __iters[3] = __first++;
+    if (__pred(*__first))
+      return __first;
+    ++__first;
 
-    __found[0] = __pred(*__iters[0]);
-    __found[1] = __pred(*__iters[1]);
-    __found[2] = __pred(*__iters[2]);
-    __found[3] = __pred(*__iters[3]);
+    if (__pred(*__first))
+      return __first;
+    ++__first;
 
-    if (__found[0] || __found[1] || __found[2] || __found[3])
-      break;
+    if (__pred(*__first))
+      return __first;
+    ++__first;
   }
 
-  if (__found[0])
-    return __iters[0];
-  if (__found[1])
-    return __iters[1];
-  if (__found[2])
-    return __iters[2];
-  if (__found[3])
-    return __iters[3];
-
-  for (; __first != __last; ++__first)
+  while (__first != __last) {
     if (__pred(*__first))
-      break;
+      return __first;
+    ++__first;
+  }
+
   return __first;
+
 }
 
 template <class _InputIterator, class _Predicate>
